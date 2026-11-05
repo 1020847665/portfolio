@@ -1,6 +1,6 @@
 # 个人作品集网站 · 设计文档
 
-> 版本 v1.0 · 2026-11-06 · 状态：已与需求方确认方向，进入实施
+> 版本 v1.1 · 2026-11-06 · 状态：Monorepo 架构已落地，全链路验证通过
 
 ## 1. 定位
 
@@ -48,15 +48,51 @@
 
 ## 6. 技术架构
 
+### 6.0 Monorepo + pnpm（v1.1 变更）
+
+工程采用 pnpm workspace 管理，统一规范、按领域拆包：
+
+```
+portfolio/
+├── pnpm-workspace.yaml          # workspace 声明
+├── tsconfig.base.json           # 全局 TS 基线（strict + paths 别名）
+├── eslint.config.js             # 全局 ESLint flat config（typescript-eslint）
+├── .npmrc                       # 私有包声明
+├── apps/
+│   └── web/                     # @portfolio/web — Next.js SPA 入口（页面、路由、hook）
+└── packages/
+    ├── shared/                  # @portfolio/shared — 类型、项目数据、设备分级常量（纯 TS，零 UI 依赖）
+    ├── ui/                      # @portfolio/ui — 通用组件（布局/卡片/屏段），依赖 shared
+    └── scenes/                  # @portfolio/scenes — 3D 场景（three 独立隔离），仅被动态 import
+```
+
+统一工程规范：
+
+| 规范 | 落点 |
+|---|---|
+| TypeScript | 根 `tsconfig.base.json`，各包 extends；`@portfolio/*` 路径别名 |
+| ESLint | 根 `eslint.config.js` flat config，所有包共享；`pnpm -r lint` 递归执行 |
+| 构建 | 各包 `pnpm -r build` 递归；web 负责最终产物 |
+| 测试 | 各包 `pnpm -r test`；测试与其代码同包放置 |
+| 依赖 | pnpm 严格隔离：ui/scenes 只声明自己用到的依赖；workspace 包用 `workspace:*` 协议 |
+
+拆包收益：
+- **three 隔离**：只有 `@portfolio/scenes` 依赖 three，移动端 low 档不加载该包（bundle 级保证，而非约定）
+- **数据与 UI 分离**：项目数据、类型、设备常量在 shared，未来加博客/后台可直接复用
+- **组件复用**：ui 包可被未来任何新 app（如文档站）引用
+
+### 6.1 技术选型
+
 | 层 | 选型 | 说明 |
 |---|---|---|
 | 框架 | React 18 + TypeScript + Vite | SPA，部署 GitHub Pages |
-| 样式 | Tailwind CSS v3.4 | 响应式断点，mobile-first |
-| 3D | three v0.169 + @react-three/fiber v8 + drei | 按需 dynamic import |
+| 样式 | Tailwind CSS v3.4 | 响应式断点，mobile-first；content 扫描含 ui/scenes 包 |
+| 3D | three v0.169 + @react-three/fiber v8 + drei | 仅 @portfolio/scenes 依赖，dynamic import |
 | 路由 | react-router-dom v7（SPA 模式） | GitHub Pages 需 HashRouter 或 404 fallback |
 | 测试 | Vitest + React Testing Library + Playwright | 单测 + E2E + 截图回归 |
+| 包管理 | pnpm 9 + workspace | 统一脚本：`pnpm dev / build / test / lint` |
 
-### 6.1 设备分级（useDeviceTier）
+### 6.2 设备分级（useDeviceTier）
 
 ```
 high：桌面 + navigator.gpu 可用 → WebGPU 全效果
@@ -66,7 +102,7 @@ low ：移动端 / 不支持者 / reduced-motion / 显存受限 → 静态视觉
 
 判定顺序：reduced-motion → 移动端（宽 < 768 或触屏 UA）→ gpu 探测 → webgl2 探测。
 
-### 6.2 条件渲染
+### 6.3 条件渲染
 
 ```tsx
 tier === 'high' → <WebGPUGalaxy />
@@ -76,7 +112,7 @@ tier === 'low'  → <StaticHero />（零 three 依赖）
 
 low 档不 import three（动态 import 隔离，bundle 分析验证）。
 
-### 6.3 部署
+### 6.4 部署
 
 - GitHub 仓库 `portfolio`（Public，main 分支）
 - GitHub Actions：CI（lint + test + build）+ Pages 部署
@@ -85,6 +121,16 @@ low 档不 import three（动态 import 隔离，bundle 分析验证）。
 ## 7. 测试策略（TDD）
 
 - 功能逻辑（数据、路由、设备分级、筛选）→ Vitest + RTL，Red-Green-Refactor
+- 测试放置：与被测代码同包（shared 测数据、web 测路由/组件/hook）
 - E2E：Playwright 跑桌面 Chromium + 移动视口关键路径
 - 3D：验证场景可挂载、卸载资源释放、low 档不加载 three、降级链路不崩溃
 - 视觉：截图回归；效果观感以实机验收为准
+
+## 8. 当前验证状态（v1.1）
+
+| 检查项 | 结果 |
+|---|---|
+| pnpm install（5 个 workspace 项目） | 通过 |
+| pnpm -r test | 20/20 全绿（shared 5 + web 15），0 未处理错误 |
+| pnpm -r build | 通过，产物 191KB（gzip 63KB） |
+| 环境备注 | 本机沙箱拦截 vitest 写系统 Temp，已用 pnpm patch 方式关闭其 transform 文件缓存（cacheFs），不影响 CI/其他环境 |
