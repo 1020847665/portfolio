@@ -14,10 +14,10 @@
     "three": "^0.169.0"
   },
   "peerDependencies": {
-    "react": "^18.0.0"
+    "react": "^19.0.0"
   },
   "devDependencies": {
-    "@react-three/fiber": "^8.17.10",
+    "@react-three/fiber": "^9.0.0",
     "@types/react": "^18.3.12",
     "@types/three": "^0.169.0",
     "typescript": "^5.6.3",

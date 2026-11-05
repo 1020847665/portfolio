@@ -1,3 +1,5 @@
+'use client';
+
 import { lazy, Suspense } from 'react';
 import { useDeviceTier } from '../hooks/useDeviceTier';
 import { StaticHero } from '@portfolio/scenes';

@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import NextLink from 'next/link';
 import type { Category } from '@portfolio/shared';
 
 interface CategoryCardProps {
@@ -9,8 +9,8 @@ interface CategoryCardProps {
 /** 分类入口卡：首页「创作方向」与总览页复用 */
 export function CategoryCard({ category, projectCount }: CategoryCardProps) {
   return (
-    <Link
-      to={category.route}
+    <NextLink
+      href={category.route}
       data-testid={`category-card-${category.id}`}
       className="group block border border-line rounded-lg p-6 bg-panel/60 hover:bg-panel transition-colors"
       style={{ borderTopColor: category.accent }}
@@ -24,6 +24,6 @@ export function CategoryCard({ category, projectCount }: CategoryCardProps) {
       <p className="mt-4 text-xs font-mono text-slate-500">
         {projectCount} 个项目 →
       </p>
-    </Link>
+    </NextLink>
   );
 }

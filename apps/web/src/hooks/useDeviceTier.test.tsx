@@ -26,11 +26,10 @@ function mockNavigatorGpu(hasGpu: boolean) {
 }
 
 function mockWebGL2(supported: boolean) {
-  const orig = HTMLCanvasElement.prototype.getContext;
   HTMLCanvasElement.prototype.getContext = function (type: string) {
     if (type === 'webgl2') return supported ? ({} as WebGL2RenderingContext) : null;
     return null;
-  } as typeof orig;
+  } as typeof HTMLCanvasElement.prototype.getContext;
 }
 
 describe('useDeviceTier', () => {

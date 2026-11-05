@@ -1,6 +1,6 @@
 # 个人作品集网站 · 设计文档
 
-> 版本 v1.1 · 2026-11-06 · 状态：Monorepo 架构已落地，全链路验证通过
+> 版本 v1.2 · 2026-11-06 · 状态：SSR（Next.js App Router）落地，全链路验证通过
 
 ## 1. 定位
 
@@ -59,10 +59,12 @@ portfolio/
 ├── eslint.config.js             # 全局 ESLint flat config（typescript-eslint）
 ├── .npmrc                       # 私有包声明
 ├── apps/
-│   └── web/                     # @portfolio/web — Next.js SPA 入口（页面、路由、hook）
+│   └── web/                     # @portfolio/web — Next.js 15 App Router（SSR）
+│       ├── app/                 # 文件路由：layout / page / not-found / projects/[category]/[slug]
+│       └── src/                 # 客户端组件（'use client'：HeroSection、hooks）
 └── packages/
     ├── shared/                  # @portfolio/shared — 类型、项目数据、设备分级常量（纯 TS，零 UI 依赖）
-    ├── ui/                      # @portfolio/ui — 通用组件（布局/卡片/屏段），依赖 shared
+    ├── ui/                      # @portfolio/ui — 通用组件（next/link），依赖 shared + next
     └── scenes/                  # @portfolio/scenes — 3D 场景（three 独立隔离），仅被动态 import
 ```
 
@@ -81,16 +83,23 @@ portfolio/
 - **数据与 UI 分离**：项目数据、类型、设备常量在 shared，未来加博客/后台可直接复用
 - **组件复用**：ui 包可被未来任何新 app（如文档站）引用
 
-### 6.1 技术选型
+### 6.1 技术选型与渲染模式（v1.2：SSR）
 
 | 层 | 选型 | 说明 |
 |---|---|---|
-| 框架 | React 18 + TypeScript + Vite | SPA，部署 GitHub Pages |
-| 样式 | Tailwind CSS v3.4 | 响应式断点，mobile-first；content 扫描含 ui/scenes 包 |
-| 3D | three v0.169 + @react-three/fiber v8 + drei | 仅 @portfolio/scenes 依赖，dynamic import |
-| 路由 | react-router-dom v7（SPA 模式） | GitHub Pages 需 HashRouter 或 404 fallback |
-| 测试 | Vitest + React Testing Library + Playwright | 单测 + E2E + 截图回归 |
+| 框架 | **Next.js 15（App Router）** + React 19 + TypeScript | **服务端渲染 SSR** |
+| 渲染策略 | 静态页 SSG（`/`、`/projects`、`/about`、`/contact`）+ 动态页 SSR（`/projects/[category]`、`/[slug]`） | 构建输出：4 静态 `○` + 2 动态 `ƒ` |
+| 客户端组件 | `'use client'` 标注：HeroSection（3D 分档）、useDeviceTier | 3D 交互仅客户端水合后激活 |
+| 样式 | Tailwind CSS v3.4 | mobile-first；content 扫描含 ui/scenes 包 |
+| 3D | three v0.169 + @react-three/fiber v9（React 19 配套） | 仅 @portfolio/scenes 依赖，lazy 动态 import |
+| 测试 | Vitest + React Testing Library + Playwright | 单测 + E2E；页面测试直接渲染 RSC 输出组件树 |
 | 包管理 | pnpm 9 + workspace | 统一脚本：`pnpm dev / build / test / lint` |
+| 部署 | **Vercel**（Next.js 官方平台，零配置） | 推送 GitHub 后自动 CI/CD；也可 Node 服务器自托管（`next start`） |
+
+SSR 收益：
+- **SEO**：首屏 HTML 由服务端输出完整内容（标题、项目列表），搜索引擎可直接索引
+- **首屏性能**：用户先看到服务端渲染的静态内容，3D 场景水合后再激活，LCP 不被 WebGL 阻塞
+- **设备分级在 SSR 安全**：服务端默认渲染 low 档静态视觉（测试已断言），客户端水合后按真实设备升级到 high/mid，无闪烁
 
 ### 6.2 设备分级（useDeviceTier）
 
@@ -115,7 +124,7 @@ low 档不 import three（动态 import 隔离，bundle 分析验证）。
 ### 6.4 部署
 
 - GitHub 仓库 `portfolio`（Public，main 分支）
-- GitHub Actions：CI（lint + test + build）+ Pages 部署
+- CI/CD：连接 Vercel 后推送 main 自动构建部署（Next.js 官方支持，无需自写 Actions）
 - Token 由需求方后续提供；凭据不写入任何代码与配置文件
 
 ## 7. 测试策略（TDD）
@@ -126,11 +135,12 @@ low 档不 import three（动态 import 隔离，bundle 分析验证）。
 - 3D：验证场景可挂载、卸载资源释放、low 档不加载 three、降级链路不崩溃
 - 视觉：截图回归；效果观感以实机验收为准
 
-## 8. 当前验证状态（v1.1）
+## 8. 当前验证状态（v1.2）
 
 | 检查项 | 结果 |
 |---|---|
-| pnpm install（5 个 workspace 项目） | 通过 |
-| pnpm -r test | 20/20 全绿（shared 5 + web 15），0 未处理错误 |
-| pnpm -r build | 通过，产物 191KB（gzip 63KB） |
-| 环境备注 | 本机沙箱拦截 vitest 写系统 Temp，已用 pnpm patch 方式关闭其 transform 文件缓存（cacheFs），不影响 CI/其他环境 |
+| pnpm install（5 个 workspace 项目，Next 15.5 + React 19） | 通过 |
+| pnpm -r test | 18/18 全绿（shared 5 + web 13），0 未处理错误 |
+| next build | 通过：4 静态页（○）+ 2 动态页（ƒ），首页 First Load JS 107KB |
+| SSR 输出验证（next start + curl） | 首页/总览/分类页 HTML 均含服务端渲染内容（标题、卡片、testid），无效分类返回 404 |
+| 环境备注 | 本机沙箱拦截 vitest 写系统 Temp 与 .next/trace：前者已补丁关闭 vitest 缓存，后者构建时加 NEXT_TRACE=0；均不影响 CI/其他环境 |

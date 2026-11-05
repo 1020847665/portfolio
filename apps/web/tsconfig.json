@@ -1,7 +1,43 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "types": ["vitest/globals", "@testing-library/jest-dom"]
+    "types": [
+      "vitest/globals",
+      "@testing-library/jest-dom"
+    ],
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "jsx": "preserve",
+    "allowJs": true,
+    "noEmit": true,
+    "paths": {
+      "@portfolio/shared/*": [
+        "../../packages/shared/src/*"
+      ],
+      "@portfolio/ui/*": [
+        "../../packages/ui/src/*"
+      ],
+      "@portfolio/scenes/*": [
+        "../../packages/scenes/src/*"
+      ]
+    },
+    "incremental": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true
   },
-  "include": ["src"]
+  "include": [
+    "src",
+    "app",
+    "next.config.ts",
+    "vitest.config.ts",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }
