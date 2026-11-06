@@ -1,8 +1,17 @@
 import { notFound } from 'next/navigation';
 import { Navbar, Footer, ProjectCard } from '@portfolio/ui';
 import { CATEGORIES, getProjectsByCategory, type CategoryId } from '@portfolio/shared';
+import { CategorySceneBanner } from '../../../src/components/CategorySceneBanner';
 
 const VALID: CategoryId[] = ['web', '3d', 'lab', 'art'];
+
+/** 分类 id → 场景语义 */
+const SCENE_BY_CATEGORY = {
+  web: 'galaxy',
+  '3d': 'nebula',
+  lab: 'attractor',
+  art: 'stylized',
+} as const;
 
 export default async function CategoryPage({
   params,
@@ -19,6 +28,7 @@ export default async function CategoryPage({
     <>
       <Navbar />
       <main data-testid="page-category" className="px-6 md:px-12 py-24 max-w-6xl mx-auto">
+        <CategorySceneBanner kind={SCENE_BY_CATEGORY[meta.id]} accent={meta.accent} />
         <h1 className="font-display text-4xl font-bold mb-2">{meta.title}</h1>
         <p className="text-slate-400 mb-10">{meta.subtitle}</p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
