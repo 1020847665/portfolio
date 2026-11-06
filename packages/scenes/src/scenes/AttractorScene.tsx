@@ -99,7 +99,7 @@ function initAttractor(canvas: HTMLCanvasElement): () => void {
 export function AttractorScene() {
   const init = useCallback(initAttractor, []);
   const fallback = useMemo(
-    () => <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,#0d1f14_0%,#0a0a0f_70%)]" />,
+    () => <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,#0c1710_0%,#010102_70%)]" />,
     [],
   );
   return (

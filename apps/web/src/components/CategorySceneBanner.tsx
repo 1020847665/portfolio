@@ -12,24 +12,17 @@ const StylizedScene = lazy(() =>
 
 /**
  * 分类页顶部场景横幅：
- * - lab → 混沌吸引子（荧光绿轨迹）；art → 神经风格化（洋红流场）
- * - 纯装饰性视觉，aria-hidden；高度受限（160px），不打断列表阅读
- * - 场景加载失败由 SceneCanvas 内部降级为渐变色块
+ * - lab → 混沌吸引子；art → 神经风格化
+ * - Linear 式克制：去掉彩色辉光，只保留 hairline 边框 + surface-1 面板
+ * - 纯装饰性视觉，aria-hidden；场景加载失败由 SceneCanvas 内部降级
  */
-export function CategorySceneBanner({
-  kind,
-  accent,
-}: {
-  kind: SceneKind;
-  accent: string;
-}) {
+export function CategorySceneBanner({ kind }: { kind: SceneKind }) {
   return (
     <div
-      className="relative h-40 md:h-52 mb-8 rounded-xl overflow-hidden border border-line"
-      style={{ boxShadow: `0 0 60px -20px ${accent}` }}
+      className="relative h-40 md:h-52 mb-10 rounded-2xl overflow-hidden border border-line bg-surface-1"
       aria-hidden
     >
-      <Suspense fallback={<div className="absolute inset-0 bg-panel" />}>
+      <Suspense fallback={<div className="absolute inset-0 bg-surface-1" />}>
         {kind === 'attractor' && <AttractorScene />}
         {kind === 'stylized' && <StylizedScene />}
       </Suspense>

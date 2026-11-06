@@ -1,15 +1,28 @@
 # 个人作品集网站 · 设计文档
 
-> 版本 v1.2 · 2026-11-06 · 状态：SSR（Next.js App Router）落地，全链路验证通过
+> 版本 v1.3 · 2026-11-06 · 状态：SSR 落地 + Linear 精修视觉体系全站落地
 
 ## 1. 定位
 
 开发者个人网站，主打「创造」：展示项目、技术热情与创意实验。视觉辨识度优先于常规模板感。
 
-## 2. 视觉方向
+## 2. 视觉方向（v1.3：对齐 Linear 精修质感）
 
-- 深空暗色底（#0a0a0f 系），霓虹点缀色按板块区分
-- 标题无衬线粗体；标签/代码用等宽字体
+设计依据 `F:/Claw/design-md/linear.md`（VoltAgent/awesome-design-md · Linear-design-analysis）：
+
+- **画布**：`#010102` 近纯黑微蓝底（Linear 全系最深暗面），不再使用 #0a0a0f 与 #000000
+- **表面阶梯**：canvas → surface-1 `#0f1011` → surface-2 `#141516` → surface-3/4，靠"抬升"而非阴影承载层级
+- **发丝线**：hairline `#23252a` / strong `#34343a` 1px 边框是卡片与分隔的默认语言
+- **唯一彩色点缀**：薰衣草蓝 primary `#5e6ad2`（hover `#828fff`，focus `#5e69d1`），仅用于主 CTA、焦点环、链接强调 —— 不做大面积铺色、不加第二彩
+- **文字四级**：ink `#f7f8f8` / muted `#d0d6e0` / subtle `#8a8f98` / tertiary `#62666d`
+- **排版**：display 600 字重 + 激进负字距（大标题 -0.04em），正文 400；eyebrow 正字距小标
+- **圆角**：按钮/输入 8px（rounded-lg）、卡片 12px（rounded-xl）、横幅/CTA 面板 16px（rounded-2xl）
+- 场景横幅去掉彩色辉光（boxShadow glow），改为 hairline + surface-1 面板；分类 accent 色仅保留卡片内的细竖线标识
+
+旧霓虹体系（#0a0a0f 底、四色 neon 点缀、青/紫/粉/绿辉光）已整体退役。
+
+### 动效与降级
+
 - 动效：入场渐显、滚动视差、卡片悬浮微交互
 - 尊重 `prefers-reduced-motion`：命中时全部动效降级为静态
 
@@ -135,12 +148,12 @@ low 档不 import three（动态 import 隔离，bundle 分析验证）。
 - 3D：验证场景可挂载、卸载资源释放、low 档不加载 three、降级链路不崩溃
 - 视觉：截图回归；效果观感以实机验收为准
 
-## 8. 当前验证状态（v1.2）
+## 8. 当前验证状态（v1.3）
 
 | 检查项 | 结果 |
 |---|---|
-| pnpm install（5 个 workspace 项目，Next 15.5 + React 19） | 通过 |
-| pnpm -r test | 18/18 全绿（shared 5 + web 13），0 未处理错误 |
-| next build | 通过：4 静态页（○）+ 2 动态页（ƒ），首页 First Load JS 107KB |
-| SSR 输出验证（next start + curl） | 首页/总览/分类页 HTML 均含服务端渲染内容（标题、卡片、testid），无效分类返回 404 |
+| pnpm -r test | 35/35 全绿（shared 8 + scenes 14 + web 13），0 未处理错误 |
+| next build | 通过：5 静态页（○）+ 2 动态页（ƒ），首页 First Load JS 230KB（three.js 全 lazy） |
+| SSR 输出验证（next start + curl） | 首页/总览/分类/详情/关于/联系 HTML 均含新视觉类与真实内容；无效分类 404；art 空分类显示"酝酿中"提示 |
+| 视觉体系 | Linear 令牌全站落地：#010102 画布、四级表面、hairline、唯一薰衣草蓝点缀、负字距 600 display |
 | 环境备注 | 本机沙箱拦截 vitest 写系统 Temp 与 .next/trace：前者已补丁关闭 vitest 缓存，后者构建时加 NEXT_TRACE=0；均不影响 CI/其他环境 |

@@ -104,7 +104,7 @@ function initStylized(canvas: HTMLCanvasElement): () => void {
 export function StylizedScene() {
   const init = useCallback(initStylized, []);
   const fallback = useMemo(
-    () => <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,#241031_0%,#0a0a0f_70%)]" />,
+    () => <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,#1d0e29_0%,#010102_70%)]" />,
     [],
   );
   return (

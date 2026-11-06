@@ -128,7 +128,7 @@ function initNebula(canvas: HTMLCanvasElement): () => void {
 export function NebulaScene() {
   const init = useCallback(initNebula, []);
   const fallback = useMemo(
-    () => <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,#1a1030_0%,#0a0a0f_70%)]" />,
+    () => <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,#171022_0%,#010102_70%)]" />,
     [],
   );
   return (

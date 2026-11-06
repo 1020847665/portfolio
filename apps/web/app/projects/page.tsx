@@ -7,7 +7,9 @@ export default function ProjectsPage() {
     <>
       <Navbar />
       <main data-testid="page-projects" className="px-6 md:px-12 py-24 max-w-6xl mx-auto">
-        <h1 className="font-display text-4xl font-bold mb-10">全部项目</h1>
+        <h1 className="font-display text-4xl font-semibold tracking-tight mb-12">
+          全部项目
+        </h1>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-16">
           {CATEGORIES.map((c) => (
             <CategoryCard

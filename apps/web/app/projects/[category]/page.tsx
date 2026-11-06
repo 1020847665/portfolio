@@ -28,14 +28,22 @@ export default async function CategoryPage({
     <>
       <Navbar />
       <main data-testid="page-category" className="px-6 md:px-12 py-24 max-w-6xl mx-auto">
-        <CategorySceneBanner kind={SCENE_BY_CATEGORY[meta.id]} accent={meta.accent} />
-        <h1 className="font-display text-4xl font-bold mb-2">{meta.title}</h1>
-        <p className="text-slate-400 mb-10">{meta.subtitle}</p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {list.map((p) => (
-            <ProjectCard key={p.slug} project={p} />
-          ))}
-        </div>
+        <CategorySceneBanner kind={SCENE_BY_CATEGORY[meta.id]} />
+        <p className="font-mono text-xs text-ink-tertiary mb-3">{meta.subtitle}</p>
+        <h1 className="font-display text-4xl font-semibold tracking-tight mb-12">
+          {meta.title}
+        </h1>
+        {list.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {list.map((p) => (
+              <ProjectCard key={p.slug} project={p} />
+            ))}
+          </div>
+        ) : (
+          <p className="text-ink-subtle">
+            这个方向的作品还在酝酿中 —— 敬请期待。
+          </p>
+        )}
       </main>
       <Footer />
     </>

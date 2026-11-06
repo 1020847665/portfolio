@@ -121,7 +121,7 @@ export function GalaxyScene() {
   const init = useCallback(initGalaxy, []);
   const fallback = useMemo(
     () => (
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,#141428_0%,#0a0a0f_70%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,#111122_0%,#010102_70%)]" />
     ),
     [],
   );

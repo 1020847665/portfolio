@@ -3,5 +3,15 @@
 @tailwind utilities;
 
 body {
-  @apply bg-void text-slate-200 antialiased;
+  @apply bg-canvas text-ink antialiased;
+}
+
+/* Linear 式选区与焦点环：薰衣草蓝，唯一彩色点缀 */
+::selection {
+  background: rgba(94, 106, 210, 0.4);
+}
+
+:focus-visible {
+  outline: 2px solid rgba(94, 105, 209, 0.6);
+  outline-offset: 2px;
 }
