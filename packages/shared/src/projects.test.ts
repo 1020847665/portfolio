@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { CATEGORIES, projects } from './projects';
+import { CATEGORIES, projects, PROFILE } from './projects';
 
 describe('项目数据', () => {
   it('定义恰好 4 个分类', () => {
@@ -23,15 +23,32 @@ describe('项目数据', () => {
     }
   });
 
-  it('演示内容被明确标注', () => {
+  it('真实项目必须带 GitHub 仓库链接', () => {
     for (const p of projects) {
-      expect(p.demo).toBe(true);
+      expect(p.repo).toMatch(/^https:\/\/github\.com\/1020847665\//);
     }
   });
 
-  it('每个分类至少有 1 个项目', () => {
+  it('项目标注不再为演示占位', () => {
+    for (const p of projects) {
+      expect(p.demo).toBe(false);
+    }
+  });
+
+  it('每个分类至少有 1 个项目，art 分类允许暂缺（真实内容不足时不造假）', () => {
     for (const c of CATEGORIES) {
+      if (c.id === 'art') continue; // 真实仓库无对应项目，不强凑
       expect(projects.some((p) => p.category === c.id)).toBe(true);
     }
+  });
+});
+
+describe('个人资料', () => {
+  it('包含真实邮箱（GitHub 公开资料邮箱）', () => {
+    expect(PROFILE.email).toBe('1020847665@qq.com');
+  });
+
+  it('包含 GitHub 主页链接', () => {
+    expect(PROFILE.github).toBe('https://github.com/1020847665');
   });
 });

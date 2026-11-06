@@ -20,7 +20,7 @@ describe('Next.js 页面（SSR 组件树）', () => {
     render(<ProjectsPage />);
     expect(screen.getByTestId('page-projects')).toBeInTheDocument();
     expect(screen.getByTestId('category-card-web')).toBeInTheDocument();
-    expect(screen.getByTestId('project-card-demo-fullstack-app')).toBeInTheDocument();
+    expect(screen.getByTestId('project-card-bestwise-yls-platform')).toBeInTheDocument();
   });
 
   it('404 页渲染', () => {
